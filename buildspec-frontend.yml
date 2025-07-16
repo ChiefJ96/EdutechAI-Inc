@@ -1,0 +1,39 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Installing dependencies...
+      - npm install -g npm@latest
+
+  pre_build:
+    commands:
+      - echo Installing project dependencies...
+      - npm ci
+      - echo Running tests...
+      - npm test -- --coverage --passWithNoTests
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building React application...
+      - npm run build
+      - echo Optimizing build...
+      - ls -la build/
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Uploading to S3...
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: 'build'
+  name: frontend-build-$(date +%Y-%m-%d-%H-%M-%S)
+
+cache:
+  paths:
+    - 'node_modules/**/*'
